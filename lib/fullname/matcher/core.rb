@@ -32,7 +32,8 @@ module Fullname::Matcher
     DEFAULT_OPTIONS = {
       :skip_match_middle_name => false, # skip match middle name if middle name not provided.
       :null_middle_name_match_allowed => false,
-      :skip_match_suffix => false      # skip match suffix if suffix not provided or no column suffix in database.
+      :skip_match_suffix => false,     # skip match suffix if suffix not provided or no column suffix in database.
+      :null_suffix_match_allowed => false
     }
 
     class Error < StandardError ; end
@@ -73,7 +74,7 @@ module Fullname::Matcher
       if match_list.size > 0
         # 1. exactly match
         exact_match_list = match_list.select do |r|
-          (compare_without_dot(r.send(@mapping[:middle]), name[:middle]) && compare_without_dot(r.send(@mapping[:suffix]), name[:suffix]) || (compare_without_dot(r.send(@mapping[:middle]), name[:middle]) || @options[:null_suffix_match_allowed]))
+          (compare_without_dot(r.send(@mapping[:middle]), name[:middle]) && compare_without_dot(r.send(@mapping[:suffix]), name[:suffix])) || (compare_without_dot(r.send(@mapping[:middle]), name[:middle]) && @options[:null_suffix_match_allowed])
         end
         return exact_match_list if exact_match_list.size > 0 && @options[:null_middle_name_match_allowed] == false && @options[:null_suffix_match_allowed] == false
         
