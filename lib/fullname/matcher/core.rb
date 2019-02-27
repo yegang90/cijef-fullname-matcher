@@ -73,9 +73,9 @@ module Fullname::Matcher
       if match_list.size > 0
         # 1. exactly match
         exact_match_list = match_list.select do |r|
-          compare_without_dot(r.send(@mapping[:middle]), name[:middle]) && compare_without_dot(r.send(@mapping[:suffix]), name[:suffix])
+          (compare_without_dot(r.send(@mapping[:middle]), name[:middle]) && compare_without_dot(r.send(@mapping[:suffix]), name[:suffix]) || (compare_without_dot(r.send(@mapping[:middle]), name[:middle]) || @options[:null_suffix_match_allowed]))
         end
-        return exact_match_list if exact_match_list.size > 0 && @options[:null_middle_name_match_allowed] == false
+        return exact_match_list if exact_match_list.size > 0 && @options[:null_middle_name_match_allowed] == false && @options[:null_suffix_match_allowed] == false
         
         # 2. if name[:middle] is not NULL, regexp match
         if name[:middle]
@@ -170,7 +170,7 @@ module Fullname::Matcher
         
         # exactly match suffix
         if name[:suffix].present?
-          matched_list_with_suffix = matched_list.select{|r| compare_without_dot(r.send(@mapping[:suffix]), name[:suffix]) }
+          matched_list_with_suffix = matched_list.select{|r| (compare_without_dot(r.send(@mapping[:suffix]), name[:suffix]) || (r.send(@mapping[:suffix]).blank? && @options[:null_suffix_match_allowed])) }
           return matched_list_with_suffix if matched_list_with_suffix.size > 0
         end
         
