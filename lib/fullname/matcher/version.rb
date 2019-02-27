@@ -1,5 +1,5 @@
 module Fullname
   module Matcher
-    VERSION = '1.0.9'
+    VERSION = '2.1.0'
   end
 end
