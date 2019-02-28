@@ -76,7 +76,7 @@ module Fullname::Matcher
         exact_match_list = match_list.select do |r|
           compare_without_dot(r.send(@mapping[:middle]), name[:middle]) && compare_without_dot(r.send(@mapping[:suffix]), name[:suffix])
         end
-        return exact_match_list if exact_match_list.size > 0 && @options[:null_middle_name_match_allowed] == false && @options[:null_suffix_match_allowed] == false
+        #return exact_match_list if exact_match_list.size > 0 && @options[:null_middle_name_match_allowed] == false && @options[:null_suffix_match_allowed] == false
         
         # 2. if name[:middle] is not NULL, regexp match
         if name[:middle]
@@ -93,7 +93,7 @@ module Fullname::Matcher
           match_list = []
         else
           # 2.2 fuzzy match: assume all matches since name[:middle] is NULL
-          return match_list
+          return @options[:null_middle_name_match_allowed] ? match_list : exact_match_list
         end        
       end
       
@@ -176,7 +176,7 @@ module Fullname::Matcher
         end
         
         # fuzzy match suffix( NULL matches NON-NULL )
-        return matched_list.select{|r| r.send(@mapping[:suffix]).to_s.strip.empty? || name[:suffix].nil? }
+        return matched_list.select{|r| @options[:null_suffix_match_allowed] ? true : r.send(@mapping[:suffix]).to_s.strip.empty?}
         
       end
       return matched_list
